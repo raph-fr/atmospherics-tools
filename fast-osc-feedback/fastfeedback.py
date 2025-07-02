@@ -9,10 +9,15 @@ import itertools
 import os
 import sparse
 import polars as pl
+
+from tqdm import tqdm
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
+print("dirPath :",dir_path)
 
 lib_oscprob = dir_path + '/build/oscprob-src/lib/libOscProb.so'
 lib_oscillogram = dir_path + '/build/src/libOscillogram.so'
+
 
 prem_default = dir_path + '/build/oscprob-src/PremTables/prem_15layers.txt'
 
@@ -549,7 +554,7 @@ class EventDistrib:
 
         channels_with_detected = itertools.product(channels, self.detected_channels)
 
-        for ch in channels_with_detected:
+        for ch in tqdm([ch for ch in channels_with_detected]):
             (ifl, ofl), detected_fl = ch
 
             if ofl == Flavor.NC:
