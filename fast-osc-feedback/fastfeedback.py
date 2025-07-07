@@ -506,7 +506,7 @@ class EventDistrib:
                  fieldIsCC='isCC', fieldNuGen="nuPDG", fieldNueFlux="nue_w",
                  fieldNumuFlux="numu_w", fieldTrueE="Ev", fieldTrueDir="direc_true",
                  fieldRecoE="recoE", fieldRecoDir="direc_reco", fieldRecoFlv="reco_pdg",
-                 exposure = 400, prem=prem_default):
+                 exposure = 400, prem=prem_default,verbose=True):
         
         self.events = events
         self.fieldIsCC = fieldIsCC
@@ -520,10 +520,10 @@ class EventDistrib:
         self.fieldRecoFlv = fieldRecoFlv
         self.exposure = exposure
 
-        self._fill_hists(Ebins, Czbins, Ebins_reco, Czbins_reco)
+        self._fill_hists(Ebins, Czbins, Ebins_reco, Czbins_reco, verbose)
         self.osc = ROOT.Oscillogram(Ebins, Czbins, prem)
 
-    def _fill_hists(self, Ebins, Czbins, Ebins_reco, Czbins_reco):
+    def _fill_hists(self, Ebins, Czbins, Ebins_reco, Czbins_reco,verbose=True):
         """
         Fills histograms with event data.
 
@@ -533,7 +533,8 @@ class EventDistrib:
             Ebins_reco (array-like): Energy bin edges for reconstructed energy.
             Czbins_reco (array-like): Cosine zenith angle bin edges for reconstructed direction.
         """
-        print("Filling histograms...")
+        if verbose : print("Filling histograms...")
+
         self.hists = {}
         self.Ebins = Ebins
         self.Czbins = Czbins
@@ -550,11 +551,16 @@ class EventDistrib:
 
         detected_channels = self.events[self.fieldRecoFlv].unique()
         self.detected_channels = [Flavor(ch) for ch in detected_channels]
-        print("Using the following detected output channels:", [ch.name for ch in self.detected_channels])
+        if verbose : print("Using the following detected output channels:", [ch.name for ch in self.detected_channels])
 
         channels_with_detected = itertools.product(channels, self.detected_channels)
 
-        for ch in tqdm([ch for ch in channels_with_detected]):
+        if not verbose :
+            iterCh = channels_with_detected
+        else :
+            iterCh = tqdm([ch for ch in channels_with_detected])     # Shows a progress bar while creating the different histograms
+
+        for ch in iterCh:
             (ifl, ofl), detected_fl = ch
 
             if ofl == Flavor.NC:
@@ -589,7 +595,7 @@ class EventDistrib:
             
             self.hists[full_ch] = sparse.COO(hist)
             # self.hists[ch], _ = np.histogramdd((selected['direc_true'], selected['Ev'], selected['direc_true'], selected['Ev']), bins=(Czbins, Ebins, Czbins_reco, Ebins_reco), weights=weights)
-        print("Finished filling histograms...")
+        if verbose : print("Finished filling histograms...")
 
     def compute_osc(self, pars):
         """
