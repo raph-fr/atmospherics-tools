@@ -13,7 +13,6 @@ import polars as pl
 from tqdm import tqdm
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-print("dirPath :",dir_path)
 
 lib_oscprob = dir_path + '/build/oscprob-src/lib/libOscProb.so'
 lib_oscillogram = dir_path + '/build/src/libOscillogram.so'
