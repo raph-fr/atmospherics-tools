@@ -28,4 +28,4 @@ set_property(TARGET OscProbLib
 set(OSCPROB_INCLUDE_DIR ${OSCPROB_SOURCE_DIR}/inc/)
 
 add_subdirectory(src)
-#target_link_libraries(Oscillogram PRIVATE OscProbLib)
+target_link_libraries(Oscillogram PRIVATE OscProbLib)
